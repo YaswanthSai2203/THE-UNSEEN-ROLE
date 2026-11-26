@@ -6,7 +6,16 @@ let failures = 0;
 const check = (c, m) => { if (c) console.log('• ok  ', m); else { failures++; console.log('FAIL', m); } };
 const G = fn => p.evaluate(fn);
 const has = f => p.evaluate(f => window.__unseen.G.story.has(f), f);
-const waitGame = async s => { const t0 = await p.evaluate(() => window.__unseen.G.time); await p.waitForFunction(([t0, s]) => window.__unseen.G.time - t0 >= s, [t0, s], { timeout: s * 30000 + 30000, polling: 100 }); };
+const diag = () => p.evaluate(() => { const g = window.__unseen.G; return JSON.stringify({ state: g.state, busy: g.isBusy(), t: g.time.toFixed(2), dlg: g.dialogue.subtitle, lock: g.input.locked, hidden: document.hidden, modal: g.ui.modal }); });
+const waitGame = async s => {
+  const t0 = await p.evaluate(() => window.__unseen.G.time);
+  for (let i = 0; i < 40; i++) {
+    const ok = await p.waitForFunction(([t0, s]) => window.__unseen.G.time - t0 >= s, [t0, s], { timeout: 15000, polling: 100 }).then(() => true, () => false);
+    if (ok) return;
+    console.log('waiting', await diag());
+  }
+  throw new Error('game time stalled');
+};
 const waitFlag = (f, ms = 300000) => p.waitForFunction(f => window.__unseen.G.story.has(f), f, { timeout: ms, polling: 200 }).then(() => true, () => false);
 const ready = () => p.waitForFunction(() => window.__unseen.G.state === 'playing' && !window.__unseen.G.isBusy(), null, { timeout: 60000 });
 const helpers = () => p.evaluate(() => { const g = window.__unseen.G, V = g.camera.position.constructor; window.T = { g, at(x, z, y) { g.player.teleport(new V(x, 0, z), y); g.player.pitch = 0; }, face(x, y, z) { g.player.lookAt(new V(x, y, z)); },

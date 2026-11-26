@@ -11,7 +11,9 @@ await p.waitForFunction(() => window.__unseen.G.worldName === 'basement' && wind
 await p.evaluate(() => { const g = window.__unseen.G, V = g.camera.position.constructor; g.world.doors.find(d => d.label === 'door').toggle(); });
 await p.waitForTimeout(3000);
 await p.evaluate(() => { const g = window.__unseen.G, V = g.camera.position.constructor; g.player.teleport(new V(0, 0, 12.9), 0); });
-for (let i = 0; i < 8; i++) {
+await p.waitForTimeout(3000);
+await p.evaluate(() => { const g = window.__unseen.G, V = g.camera.position.constructor; g.player.teleport(new V(0, 0, 13.7), 0); });
+for (let i = 0; i < 4; i++) {
   await p.waitForTimeout(2500);
   console.log(JSON.stringify(await p.evaluate(() => { const g = window.__unseen.G;
     return { t: g.time.toFixed(1), state: g.state, ch: g.story.chapter, pos: [g.player.position.x.toFixed(2), g.player.position.z.toFixed(2)], vis: ['rabbit', 'shoe', 'crayons', 'drawing'].map(k => g.worldRoot.getObjectByName('Memory_' + k).visible), lock: g.input.locked, screen: document.getElementById('screen').className }; })));
