@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Executes the pure-logic EditMode tests under .NET with NUnitLite. The listed game sources are compiled
+    unchanged against a tiny math shim (stubs/UnityMathShim.cs.txt) because Unity's own assemblies cannot run
+    outside the engine. In Unity, the same tests run in the Test Runner against the real engine.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <NoWarn>CS0649</NoWarn>
+    <S>../../../Assets/_Project/Scripts/</S>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(S)Perception/PerceptionModel.cs;$(S)Observation/ObservationMath.cs;$(S)Story/StoryFlags.cs;$(S)Story/StoryRules.cs;$(S)Story/StoryState.cs;$(S)Story/StoryContent.cs;$(S)Story/Line.cs;$(S)Inventory/InventoryState.cs;$(S)SaveSystem/SaveData.cs;$(S)Horror/HorrorEvent.cs;$(S)Horror/HorrorScheduler.cs;$(S)Puzzles/PuzzleLogic.cs;$(S)Audio/Snd.cs" />
+    <Compile Include="../../../Assets/_Project/Tests/EditMode/LogicTests.cs;Program.cs;../stubs/UnityMathShim.cs.txt" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnitLite" Version="3.14.0" />
+  </ItemGroup>
+</Project>

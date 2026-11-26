@@ -1,0 +1,6 @@
+{
+  "name": "Unseen.Editor",
+  "rootNamespace": "Unseen.EditorTools",
+  "references": ["Unseen", "Unity.RenderPipelines.Universal.Runtime", "Unity.RenderPipelines.Core.Runtime"],
+  "includePlatforms": ["Editor"]
+}

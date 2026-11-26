@@ -1,0 +1,6 @@
+{
+  "name": "Unseen.URP",
+  "rootNamespace": "Unseen",
+  "references": ["Unseen", "Unity.RenderPipelines.Universal.Runtime", "Unity.RenderPipelines.Core.Runtime"],
+  "autoReferenced": true
+}

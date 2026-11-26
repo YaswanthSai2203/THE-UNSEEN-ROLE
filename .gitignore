@@ -1,0 +1,21 @@
+# Unity
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+*.csproj
+*.sln
+*.pidb
+*.userprefs
+.vs/
+.idea/
+# compile-check harness output
+tools/compilecheck/bin/
+tools/compilecheck/obj/
+tools/compilecheck/ref/
+tools/compilecheck/*/bin/
+tools/compilecheck/*/obj/
+!tools/compilecheck/**/*.csproj

@@ -1,0 +1,4 @@
+public static class Program
+{
+    public static int Main(string[] args) => new NUnitLite.AutoRun().Execute(args);
+}

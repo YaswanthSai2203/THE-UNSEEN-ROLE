@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Compile-check of editor scripts. URP-specific code is excluded via the UNSEEN_NO_URP define. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <AssemblyName>Unseen.Editor</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <DefineConstants>UNITY_EDITOR;UNSEEN_NO_URP</DefineConstants>
+    <NoWarn>CS0649;CS0618</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../../Assets/_Project/Scripts/Editor/**/*.cs" />
+    <Reference Include="../ref/*.dll" />
+    <Reference Include="../ref/editor/UnityEditor.dll" />
+    <ProjectReference Include="../Runtime/Runtime.csproj" />
+  </ItemGroup>
+</Project>
