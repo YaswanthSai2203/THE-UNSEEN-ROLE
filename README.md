@@ -2,10 +2,64 @@
 
 *You can only see what you are willing to forget.*
 
-A first-person psychological horror game for Windows, made in Unity 6 with URP. You wake in an apartment you don't
-recognise, and some things in it only move while you aren't looking at them.
+A first-person psychological horror game. You wake in an apartment you don't recognise, and some things in it
+only move while you aren't looking at them.
 
-> **Status:** The full game exists as source code: five chapters, ten puzzles and three endings. It compiles, and
+This repository has **two versions of the same game**:
+
+| | Browser version (`web/`) | Unity version (`Assets/`) |
+|---|---|---|
+| How to play | Open a web page. Nothing to install | Needs the Unity 6 Editor to build |
+| Status | **Complete and tested**: an automated playthrough in Chromium covers all 5 chapters, 10 puzzles and 3 endings | Source complete, compile-checked, **never run in Unity** |
+| Tech | JavaScript + three.js, one static folder | C#, Unity 6 + URP |
+
+## Play in your browser
+
+**Locally, no install:** open `web/dist/standalone.html` in Chrome, Edge or Firefox on a computer. Double-click
+the file. It is the whole game in one file.
+
+**Deploy to Vercel** (the repo includes a `vercel.json`):
+
+1. Push this repository to GitHub.
+2. In Vercel, choose **Add New → Project** and import the repository. Leave every setting at its default; `vercel.json` already
+   says how to build (`web/` → `web/dist`).
+3. Click **Deploy**. You get a link like `https://the-unseen.vercel.app` that anyone can play.
+
+From the command line instead:
+
+```bash
+npm i -g vercel
+```
+```bash
+vercel deploy --prod
+```
+
+**Any other static host:** upload the contents of `web/dist/` (it needs no server code).
+
+**Controls:** click the game to capture the mouse. W A S D move, mouse looks, E interacts, Shift walks faster,
+C crouches, **hold Q to close your eyes**, F is the flashlight, G the instant camera, Tab the inventory,
+Esc or P pauses. All keys can be changed in Settings. Saves are kept in your browser.
+
+**Build and test the browser version** (Node 18+):
+
+```bash
+cd web && npm install && node build.mjs
+```
+```bash
+cd web && npm test
+```
+```bash
+cd web && node tests/e2e.mjs
+```
+
+The last command plays the whole game in headless Chromium: every chapter, every puzzle, save and continue,
+and all three endings. It needs Playwright and takes 15 to 25 minutes in software rendering.
+
+---
+
+## Unity version
+
+> **Status:** The Unity version of the game exists as source code: five chapters, ten puzzles and three endings. It compiles, and
 > its logic tests pass. It was written in an environment **without the Unity Editor**, so it has **not yet been
 > played inside Unity**. Before release it needs an in-editor playthrough and a Windows build (steps below).
 > See [Docs/STATUS.md](Docs/STATUS.md) for exactly what has been verified.

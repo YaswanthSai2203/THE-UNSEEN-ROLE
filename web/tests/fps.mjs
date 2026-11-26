@@ -1,0 +1,10 @@
+import { open } from './smoke.mjs';
+const t = await open();
+const p = t.page;
+await p.evaluate(() => localStorage.setItem('unseen_settings_v1', JSON.stringify({ quality: 'low', shadows: false })));
+await p.reload(); await p.waitForTimeout(1200); await p.click('#begin'); await p.waitForTimeout(500);
+await p.getByText('New Game').click();
+await p.waitForFunction(() => window.__unseen.G.state === 'playing', null, { timeout: 30000 });
+const r = await p.evaluate(() => new Promise(res => { const g = window.__unseen.G, t0 = g.time, w0 = performance.now(); let n = 0; const f = () => { n++; if (performance.now() - w0 > 3000) res({ fps: n / 3, gameSecondsPer3s: g.time - t0 }); else requestAnimationFrame(f); }; requestAnimationFrame(f); }));
+console.log(JSON.stringify(r));
+await t.close();
