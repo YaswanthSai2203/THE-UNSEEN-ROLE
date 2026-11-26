@@ -22,7 +22,8 @@ export function installApartmentEvents(b) {
   const inLiving = () => inRect(P(), -6, -0.75, 0, 5.5), inBath = () => inRect(P(), 0.75, 4, 2, 5);
   const inBed = () => inRect(P(), 0.75, 6, 5, 10), inHall = () => inRect(P(), -0.75, 0.75, 0, 14);
   const lock = new CombinationLock('0219'), channels = new ChannelSequence(11, 4, 7), grounded = {};
-  let tvBusy = false, tvChannel = 1, inCall = false, ringStart = 0, pending = null, mirrorDark = 0, musicTimer = 0, anomalyPhase = 0, anomalyAway = 0, guide = null;
+  b.tvBusy = false;
+  let tvChannel = 1, inCall = false, ringStart = 0, pending = null, mirrorDark = 0, musicTimer = 0, anomalyPhase = 0, anomalyAway = 0, guide = null;
   b.ringing = false;
 
   // ---------------------------------------------------------------- entering / leaving
@@ -60,7 +61,7 @@ export function installApartmentEvents(b) {
   const d = G.director;
   d.register(callEvent('call1', F.FrontDoorTried, F.Phone1, LINES.call1, () => { G.perception.hit(4); G.dialogue.play(LINES.afterCall1); G.story.set(F.Phone1); }));
   d.register({ id: 'tv_live', story: true, requires: F.GotCamera, blockedBy: F.TvLiveSeen, timeout: 60,
-    condition: () => inLiving() && !tvBusy && P().distanceTo(V(-3.4, 0, 0.36)) < 4.5 && !G.dialogue.busy,
+    condition: () => inLiving() && !b.tvBusy && P().distanceTo(V(-3.4, 0, 0.36)) < 4.5 && !G.dialogue.busy,
     start: () => tvLiveSequence(), completion: () => has(F.TvLiveSeen) });
   d.register({ id: 'radio', story: true, requires: F.DiaryRead, blockedBy: F.RadioOn, condition: () => !G.dialogue.busy,
     start: () => { b.radioLoop.play(); G.story.set(F.RadioOn); G.dialogue.play(LINES.radio, 'radio', b.radio); } });
@@ -98,7 +99,7 @@ export function installApartmentEvents(b) {
   d.register({ id: 'bed_steps', oneShot: false, minChapter: 2, cooldown: 120, probability: 0.07,
     condition: () => inBed() && !G.observation.isPointObserved(V(4.95, 0.5, 8)), start: () => stepsAround() });
   d.register({ id: 'tv_remote', oneShot: false, minChapter: 2, requires: F.TvLiveSeen, cooldown: 150, probability: 0.07,
-    condition: () => inLiving() && !tvBusy && b.tv.mode === 'off', start: () => tvRemoteFlash() });
+    condition: () => inLiving() && !b.tvBusy && b.tv.mode === 'off', start: () => tvRemoteFlash() });
   d.register({ id: 'bed_mirror', oneShot: false, minChapter: 2, maxChapter: 3, cooldown: 200, probability: 0.08,
     condition: () => inBed() && !b.bedMirror.anomaly, start: () => { b.bedMirror.anomaly = true; later(25, () => (b.bedMirror.anomaly = false)); } });
   d.register({ id: 'hall_figure', oneShot: false, minChapter: 3, cooldown: 120, probability: 0.1, anchor: V(0, 1, 9.4), visibility: 'unobserved',
@@ -188,7 +189,7 @@ export function installApartmentEvents(b) {
 
   // ---------------------------------------------------------------- television
   async function tvLiveSequence() {
-    tvBusy = true; b.tv.static(); await wait(1.5);
+    b.tvBusy = true; b.tv.static(); await wait(1.5);
     const tv = V(-3.4, 0, 0.36), away = P().clone().sub(tv).setY(0).normalize();
     const fp = P().clone().addScaledVector(away, 0.9); fp.x = THREE.MathUtils.clamp(fp.x, -5.6, -1.0); fp.z = THREE.MathUtils.clamp(fp.z, 0.8, 5.1);
     const fig = b.figure('TVFigure', [fp.x, 0, fp.z], (Math.atan2(tv.x - fp.x, tv.z - fp.z) * 180) / Math.PI, 1);
@@ -198,13 +199,13 @@ export function installApartmentEvents(b) {
     fig.removeFromParent();
     b.tv.showFeed(b.tvBathCam); await wait(4.5);
     b.tv.static(); await wait(0.4); b.tv.off();
-    G.dialogue.play(LINES.tvLive, 'thought', null, () => { G.story.set(F.TvLiveSeen); tvBusy = false; });
+    G.dialogue.play(LINES.tvLive, 'thought', null, () => { G.story.set(F.TvLiveSeen); b.tvBusy = false; });
   }
   async function tvRemoteFlash() {
-    tvBusy = true; b.tv.static(); await wait(1); b.tv.showFeed(b.remoteCam); await wait(6); b.tv.static(); await wait(0.5); b.tv.off(); tvBusy = false;
+    b.tvBusy = true; b.tv.static(); await wait(1); b.tv.showFeed(b.remoteCam); await wait(6); b.tv.static(); await wait(0.5); b.tv.off(); b.tvBusy = false;
     if (!has('remote_seen')) { G.story.set('remote_seen'); thought('A child\'s bedroom. There is no child\'s bedroom in this apartment.'); }
   }
-  b.useTelevision = () => { if (!tvBusy) G.ui.openChannels(tvChannel, tune); };
+  b.useTelevision = () => { if (!b.tvBusy) G.ui.openChannels(tvChannel, tune); };
   function tune(ch) {
     tvChannel = ch;
     if (channels.push(ch) && has(F.KitchenMsg) && !has(F.TvSolved)) { G.ui.closeModals(); broadcast(); return; }
@@ -213,7 +214,7 @@ export function installApartmentEvents(b) {
     else b.tv.static();
   }
   async function broadcast() {
-    tvBusy = true; b.tv.static(); await wait(1);
+    b.tvBusy = true; b.tv.static(); await wait(1);
     const c = canvas(320, 240), x = c.getContext('2d');
     x.fillStyle = '#1a244d'; x.fillRect(0, 0, 320, 240);
     x.fillStyle = '#f2d980'; x.font = `26px ${HAND}`; x.textAlign = 'center'; x.fillText('HAPPY BIRTHDAY', 160, 40);
@@ -224,7 +225,7 @@ export function installApartmentEvents(b) {
     G.story.journal('Television, channels 11-4-7: TRIANGLE = 2');
     G.perception.restore(10, 'A memory steadies you.');
     G.story.set(F.TvSolved);
-    await wait(2); b.tv.off(); tvBusy = false;
+    await wait(2); b.tv.off(); b.tvBusy = false;
   }
   let testTex = null;
   function testCard() {

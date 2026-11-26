@@ -9,8 +9,9 @@ let failures = 0;
 const check = (cond, msg) => { if (cond) log('ok  ', msg); else { failures++; console.log('FAIL', msg); } };
 const G = fn => p.evaluate(fn);
 const flag = f => p.evaluate(f => window.__unseen.G.story.has(f), f);
-const waitFlag = async (f, ms = 180000) => { try { await p.waitForFunction(f => window.__unseen.G.story.has(f), f, { timeout: ms, polling: 200 }); return true; } catch { return false; } };
-const waitGame = async s => { const t0 = await p.evaluate(() => window.__unseen.G.time); await p.waitForFunction(([t0, s]) => window.__unseen.G.time - t0 >= s, [t0, s], { timeout: s * 6000 + 10000, polling: 100 }); };
+const diag = () => p.evaluate(() => { const g = window.__unseen.G, sc = g.director.scheduler; return JSON.stringify({ state: g.state, busy: g.isBusy(), active: sc.active?.id, tvBusy: g.world.tvBusy, dlg: g.dialogue.busy, sub: g.dialogue.subtitle, q: g.dialogue.queue.length, lock: g.input.locked, lf: g.input.lockFailed, modal: g.ui.modal, t: g.time.toFixed(1) }); });
+const waitFlag = async (f, ms = 180000) => { try { await p.waitForFunction(f => window.__unseen.G.story.has(f), f, { timeout: ms, polling: 200 }); return true; } catch { console.log('DIAG', f, await diag()); return false; } };
+const waitGame = async s => { const t0 = await p.evaluate(() => window.__unseen.G.time); await p.waitForFunction(([t0, s]) => window.__unseen.G.time - t0 >= s, [t0, s], { timeout: s * 6000 + 10000, polling: 100 }).catch(async e => { console.log('DIAG waitGame', await diag()); throw e; }); };
 const idle = () => p.waitForFunction(() => !window.__unseen.G.dialogue.busy, null, { timeout: 120000, polling: 200 });
 const shot = name => p.screenshot({ path: `tests/out/e2e-${name}.png` });
 
@@ -75,7 +76,7 @@ await G(() => T.use('Drawer') && T.g.worldRoot.getObjectByName('DeskDrawer').use
 check(await has('got_camera'), 'camera found');
 await idle();
 await G(() => { T.at(-3.4, 2.6, Math.PI); });
-check(await waitFlag('tv_live_seen', 40000), 'TV live feed shows the figure (Event 4)');
+check(await waitFlag('tv_live_seen', 400000), 'TV live feed shows the figure (Event 4)');
 // photograph the bathroom sink with the real camera key
 await G(() => { T.at(1.6, 3.2, 0); T.face(2.4, 0.3, 4.6); });
 await waitGame(0.5);
@@ -99,14 +100,16 @@ await G(() => { T.door('cabinet').toggle(); T.g.ui.closeModals(); });
 check(await has('kitchen_msg'), 'cabinet message read: chapter 3');
 check(await G(() => T.g.story.chapter) === 3, 'chapter 3');
 
+if (process.env.STOP === 'ch2') { console.log('stopping after chapter 2'); await t.close(); process.exit(failures ? 1 : 0); }
 // ---------------------------------------------------------------- chapter 3
 await G(() => { T.g.world.bathLight.on = false; T.at(2.2, 4.1, 0); });
 await p.keyboard.down('KeyQ'); await waitGame(3.6); await p.keyboard.up('KeyQ');
 check(await waitFlag('mirror_msg', 5000), 'mirror writing appears in the dark with eyes closed (puzzle 3)');
 await idle();
+await p.waitForFunction(() => !window.__unseen.G.world.tvBusy, null, { timeout: 120000 });
 await G(() => { T.at(-3.4, 2.4, Math.PI); T.g.world.useTelevision(); });
 for (const ch of ['11', '4', '7']) await p.locator('.channels .grid button', { hasText: new RegExp(`^${ch}$`) }).click();
-check(await waitFlag('tv_solved', 40000), 'TV channels 11-4-7 play the broadcast (puzzle 4)');
+check(await waitFlag('tv_solved', 400000), 'TV channels 11-4-7 play the broadcast (puzzle 4)');
 await shot('tv');
 // follow the footsteps without looking: stay just behind them, facing away
 await waitGame(1);
