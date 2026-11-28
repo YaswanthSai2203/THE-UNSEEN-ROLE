@@ -69,7 +69,7 @@ await G(() => T.g.transitionTo('apartment', 'from_basement'));
 await p.waitForFunction(() => window.__unseen.G.worldName === 'apartment' && window.__unseen.G.state === 'playing' && !window.__unseen.G.isBusy(), null, { timeout: 60000 });
 await helpers();
 await G(() => T.g.world.doors.find(d => d.label === 'front door').toggle());
-await p.getByText('Yes').click();
+await p.getByRole('button', { name: 'Yes', exact: true }).click();
 await p.waitForFunction(() => window.__unseen.G.state === 'ending', null, { timeout: 60000 }).catch(() => {});
 check(await G(() => T.g.state === 'ending' && T.g.endingsSeen.has(1)), 'FORGET: leave by the front door');
 // let an ending play out and return to the menu

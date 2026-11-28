@@ -205,7 +205,7 @@ for (const [name, run] of [['STAY', async () => { await G(() => T.at(0, 13.4, Ma
     await G(() => T.g.transitionTo('apartment', 'from_basement'));
     await p.waitForFunction(() => window.__unseen.G.worldName === 'apartment' && window.__unseen.G.state === 'playing' && !window.__unseen.G.isBusy(), null, { timeout: 30000 });
     await G(() => T.g.world.doors.find(d => d.label === 'front door').toggle());
-    await p.getByText('Yes').click();
+    await p.getByRole('button', { name: 'Yes', exact: true }).click();
   }]]) {
   await p.evaluate(() => { const g = window.__unseen.G; g.state = 'paused'; });
   await p.evaluate(() => { const g = window.__unseen.G; g.state = 'menu'; });

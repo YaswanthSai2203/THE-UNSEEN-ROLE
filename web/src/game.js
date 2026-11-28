@@ -81,7 +81,7 @@ G.perception = {
   },
   update(dt) {
     if (G.state !== 'playing' || !G.player) { this._drain = this._recover = 0; return; }
-    if (G.player.eyesClosed && G.player.closedTime > 6) this._drain += 1.2; // closing your eyes is not a free escape
+    if (G.player.eyesClosed && G.player.closedTime > 6 && this.model.value > 20) this._drain += 1.2; // not a free escape, but never a knockout on its own
     this.model.tick(dt, this._drain, this._recover);
     this._drain = this._recover = 0;
     if (this.model.depleted) G.blackout(pick(BLACKOUTS));

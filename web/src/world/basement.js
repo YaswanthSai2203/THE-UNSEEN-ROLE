@@ -287,7 +287,8 @@ export class BasementBuilder extends WorldBuilder {
     // REMEMBER: look at the empty chair, and keep looking.
     const eye = p.eye, fwd = G.camera.getWorldDirection(V(0, 0, 0)), target = this.chair.position.clone().setY(0.6);
     const looking = !p.eyesClosed && angleTo(eye, fwd, target) < 14 && G.physics.lineOfSight(eye, target, this.chair);
-    if (looking) { this.gaze += dt; G.perception.drain(3.5); if (this.gaze > 4 && Math.random() < dt * 0.8) p.shake(0.006, 0.4); }
+    // Gazing shakes you but never knocks you out: the choice must stay reachable.
+    if (looking) { this.gaze += dt; if (G.perception.value > 20) G.perception.drain(3.5); if (this.gaze > 4 && Math.random() < dt * 0.8) p.shake(0.006, 0.4); }
     else this.gaze = Math.max(0, this.gaze - dt * 1.5);
     this.spot.intensity = (this.gaze / 12) * 2.2 * G.lightScale;
     if (this.gaze >= 12) { G.triggerEnding(Ending.Remember); return; }
