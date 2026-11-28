@@ -134,6 +134,12 @@ function boot() {
   // ------------------------------------------------------------------ loop
   let last = performance.now(), prevState = '';
   function frame(now) {
+    // One faulty frame must never freeze the game: log it and keep the loop alive.
+    try { step(now); } catch (e) { console.error(e); }
+    G.input.endFrame();
+    requestAnimationFrame(frame);
+  }
+  function step(now) {
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
     if (G.state !== 'paused') G.time += dt;
     if (G.state !== prevState) { prevState = G.state; G.ui.renderScreen(); }
@@ -167,8 +173,6 @@ function boot() {
       grain.style.opacity = (0.05 + d * 0.12).toFixed(3);
     }
     if (G.settings.motionBlur && !rm) composer.render(); else renderer.render(G.scene, G.camera);
-    G.input.endFrame();
-    requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 

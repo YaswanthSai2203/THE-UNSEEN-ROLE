@@ -15,7 +15,7 @@ export async function open() {
   const page = await browser.newPage({ viewport: { width: 960, height: 540 } });
   const errors = [];
   page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') errors.push(`[${m.type()}] ${m.text()}`); });
-  page.on('pageerror', e => errors.push('[pageerror] ' + e.message + '\n' + (e.stack || '').split('\n').slice(0, 4).join('\n')));
+  page.on('pageerror', e => errors.push('[pageerror] ' + e.message + '\n' + (e.stack || '').split('\n').slice(0, 8).join('\n')));
   await page.goto(`http://localhost:${port}/index.html`);
   return { page, browser, server, errors, close: async () => { await browser.close(); server.close(); } };
 }

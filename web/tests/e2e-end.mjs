@@ -4,7 +4,7 @@ const t = await open();
 const p = t.page;
 let failures = 0;
 const check = (c, m) => { if (c) console.log('• ok  ', m); else { failures++; console.log('FAIL', m); } };
-const G = fn => p.evaluate(fn);
+const G = (fn, arg) => p.evaluate(fn, arg);
 const has = f => p.evaluate(f => window.__unseen.G.story.has(f), f);
 const diag = () => p.evaluate(() => { const g = window.__unseen.G; return JSON.stringify({ state: g.state, busy: g.isBusy(), t: g.time.toFixed(2), dlg: g.dialogue.subtitle, lock: g.input.locked, hidden: document.hidden, modal: g.ui.modal }); });
 const waitGame = async s => {

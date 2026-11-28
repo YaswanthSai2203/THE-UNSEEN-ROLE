@@ -7,7 +7,7 @@ const p = t.page;
 const log = (...a) => console.log('•', ...a);
 let failures = 0;
 const check = (cond, msg) => { if (cond) log('ok  ', msg); else { failures++; console.log('FAIL', msg); } };
-const G = fn => p.evaluate(fn);
+const G = (fn, arg) => p.evaluate(fn, arg);
 const flag = f => p.evaluate(f => window.__unseen.G.story.has(f), f);
 const diag = () => p.evaluate(() => { const g = window.__unseen.G, sc = g.director.scheduler; return JSON.stringify({ state: g.state, busy: g.isBusy(), active: sc.active?.id, tvBusy: g.world.tvBusy, dlg: g.dialogue.busy, sub: g.dialogue.subtitle, q: g.dialogue.queue.length, lock: g.input.locked, lf: g.input.lockFailed, modal: g.ui.modal, t: g.time.toFixed(1) }); });
 const waitFlag = async (f, ms = 180000) => { try { await p.waitForFunction(f => window.__unseen.G.story.has(f), f, { timeout: ms, polling: 200 }); return true; } catch { console.log('DIAG', f, await diag()); return false; } };
