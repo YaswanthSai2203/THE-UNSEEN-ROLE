@@ -223,11 +223,11 @@ G.triggerEnding = ending => {
   if (G.state === 'ending') return;
   (async () => {
     busy.v = true; G.state = 'ending'; G.input.unlock();
+    G.endingsSeen.add(ending); // record at once, so closing the page during the fade still counts it
+    try { G.storage.set('unseen_endings', JSON.stringify([...G.endingsSeen])); } catch { /* storage full or blocked */ }
     G.ui.closeModals(); G.dialogue.stopAll();
     await G.ui.fade(1, 3);
     G.audio.stopAll();
-    G.endingsSeen.add(ending);
-    try { G.storage.set('unseen_endings', JSON.stringify([...G.endingsSeen])); } catch { /* storage full or blocked */ }
     await G.ui.playEnding(ending); // the checkpoint before the choice stays saved, so every ending can be reached
     busy.v = false;
     G.toMenu(false);
